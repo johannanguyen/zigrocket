@@ -74,9 +74,9 @@ function makeStars(W, H) {
     id: i,
     x: Math.random() * W,
     y: Math.random() * H,
-    size: Math.random() * 2.2 + 0.4,
+    size: Math.random() * 2.5 + 0.5,
     speed: Math.random() * 0.7 + 0.3,
-    opacity: Math.random() * 0.6 + 0.3,
+    opacity: Math.random() * 0.5 + 0.5,
     twinkleOffset: Math.random() * Math.PI * 2,
   }));
 }
@@ -272,16 +272,18 @@ export default function ZigRocket() {
   // ── draw helpers ──────────────────────────────────────────────────────────
   function drawBackground(ctx, W, H) {
     const bg = ctx.createLinearGradient(0,0,0,H);
-    bg.addColorStop(0,"#6b46c1"); bg.addColorStop(.4,"#7c5cbf");
-    bg.addColorStop(.75,"#7b4ea8"); bg.addColorStop(1,"#6d3fa0");
+    bg.addColorStop(0,"#0a0015"); bg.addColorStop(.3,"#0d0530");
+    bg.addColorStop(.6,"#0a0a2e"); bg.addColorStop(.85,"#110038");
+    bg.addColorStop(1,"#1a0050");
     ctx.fillStyle = bg; ctx.fillRect(0,0,W,H);
     const t = Date.now()/8000;
     for (const [nx,ny,nr,nc] of [
-      [W*.12,H*.15,W*.27,"rgba(220,210,255,0.35)"],
-      [W*.83,H*.31,W*.23,"rgba(190,220,255,0.30)"],
-      [W*.50,H*.59,W*.29,"rgba(230,210,255,0.32)"],
-      [W*.17,H*.81,W*.21,"rgba(255,210,230,0.30)"],
-      [W*.79,H*.87,W*.19,"rgba(210,210,255,0.28)"],
+      [W*.12,H*.15,W*.30,"rgba(100,60,220,0.35)"],
+      [W*.83,H*.31,W*.25,"rgba(40,80,200,0.28)"],
+      [W*.50,H*.55,W*.32,"rgba(120,40,200,0.30)"],
+      [W*.17,H*.80,W*.22,"rgba(80,20,180,0.25)"],
+      [W*.79,H*.87,W*.20,"rgba(60,100,220,0.25)"],
+      [W*.40,H*.25,W*.18,"rgba(180,80,255,0.20)"],
     ]) {
       const gr = ctx.createRadialGradient(
         nx+Math.sin(t+nx)*12, ny+Math.cos(t+ny*.01)*10, 0, nx, ny, nr
@@ -576,7 +578,7 @@ export default function ZigRocket() {
   return (
     <div style={{
       width:"100vw", height:"100vh", overflow:"hidden",
-      background:"#6b46c1", fontFamily:"'Trebuchet MS', cursive",
+      background:"#0a0015", fontFamily:"'Trebuchet MS', cursive",
       position:"relative", touchAction:"none",
     }}>
       <canvas ref={canvasRef} width={W} height={H} style={{
