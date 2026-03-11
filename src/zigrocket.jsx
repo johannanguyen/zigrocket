@@ -4,7 +4,7 @@ import { AdMob, AdMobRewardItem, RewardAdPluginEvents } from "@capacitor-communi
 // ─────────────────────────────────────────────────────────────────────────────
 // AD CONFIG
 // ─────────────────────────────────────────────────────────────────────────────
-const AD_REWARDED_ID = "ca-app-pub-3940256099942544/1712485313";
+const AD_REWARDED_ID = "ca-app-pub-9841742295978516/5946233570"; // ca-app-pub-XXXXXXXXXXXXXXXX/XXXXXXXXXX
 
 async function initAdMob() {
   try {
@@ -16,7 +16,7 @@ async function prepareRewarded() {
   try {
     await AdMob.prepareRewardVideoAd({
       adId: AD_REWARDED_ID,
-      isTesting: true,
+      isTesting: false,
     });
     return true;
   } catch(e) { console.warn("AdMob prepare:", e); return false; }
@@ -137,15 +137,17 @@ export default function ZigRocket() {
     });
     const subClosed = AdMob.addListener(RewardAdPluginEvents.Dismissed, () => {
       setAdPlaying(false);
-      // force audio context resume — use timeout to let iOS fully release audio session
+      // iOS takes over audio session during ads — force recreate the context
       setTimeout(() => {
         try {
-          if (audioCtx.current?.state === "suspended") audioCtx.current.resume();
-          if (!audioCtx.current) {
-            audioCtx.current = new (window.AudioContext || window.webkitAudioContext)();
+          if (audioCtx.current) {
+            audioCtx.current.close();
+            audioCtx.current = null;
           }
-        } catch {}
-      }, 300);
+          audioCtx.current = new (window.AudioContext || window.webkitAudioContext)();
+          audioCtx.current.resume();
+        } catch(e) { console.warn("Audio resume failed:", e); }
+      }, 500);
       if (rewardEarned.current) {
         rewardEarned.current = false;
         doRevive();
