@@ -137,8 +137,15 @@ export default function ZigRocket() {
     });
     const subClosed = AdMob.addListener(RewardAdPluginEvents.Dismissed, () => {
       setAdPlaying(false);
-      // resume audio context after ad interruption
-      if (audioCtx.current?.state === "suspended") audioCtx.current.resume();
+      // force audio context resume — use timeout to let iOS fully release audio session
+      setTimeout(() => {
+        try {
+          if (audioCtx.current?.state === "suspended") audioCtx.current.resume();
+          if (!audioCtx.current) {
+            audioCtx.current = new (window.AudioContext || window.webkitAudioContext)();
+          }
+        } catch {}
+      }, 300);
       if (rewardEarned.current) {
         rewardEarned.current = false;
         doRevive();
@@ -265,16 +272,16 @@ export default function ZigRocket() {
   // ── draw helpers ──────────────────────────────────────────────────────────
   function drawBackground(ctx, W, H) {
     const bg = ctx.createLinearGradient(0,0,0,H);
-    bg.addColorStop(0,"#4a2d9c"); bg.addColorStop(.4,"#5a34a8");
-    bg.addColorStop(.75,"#5c2a8a"); bg.addColorStop(1,"#4e2278");
+    bg.addColorStop(0,"#6b46c1"); bg.addColorStop(.4,"#7c5cbf");
+    bg.addColorStop(.75,"#7b4ea8"); bg.addColorStop(1,"#6d3fa0");
     ctx.fillStyle = bg; ctx.fillRect(0,0,W,H);
     const t = Date.now()/8000;
     for (const [nx,ny,nr,nc] of [
-      [W*.12,H*.15,W*.27,"rgba(196,181,253,0.30)"],
-      [W*.83,H*.31,W*.23,"rgba(147,197,253,0.24)"],
-      [W*.50,H*.59,W*.29,"rgba(216,180,254,0.26)"],
-      [W*.17,H*.81,W*.21,"rgba(249,168,212,0.24)"],
-      [W*.79,H*.87,W*.19,"rgba(165,180,252,0.22)"],
+      [W*.12,H*.15,W*.27,"rgba(220,210,255,0.35)"],
+      [W*.83,H*.31,W*.23,"rgba(190,220,255,0.30)"],
+      [W*.50,H*.59,W*.29,"rgba(230,210,255,0.32)"],
+      [W*.17,H*.81,W*.21,"rgba(255,210,230,0.30)"],
+      [W*.79,H*.87,W*.19,"rgba(210,210,255,0.28)"],
     ]) {
       const gr = ctx.createRadialGradient(
         nx+Math.sin(t+nx)*12, ny+Math.cos(t+ny*.01)*10, 0, nx, ny, nr
@@ -569,7 +576,7 @@ export default function ZigRocket() {
   return (
     <div style={{
       width:"100vw", height:"100vh", overflow:"hidden",
-      background:"#4a2d9c", fontFamily:"'Trebuchet MS', cursive",
+      background:"#6b46c1", fontFamily:"'Trebuchet MS', cursive",
       position:"relative", touchAction:"none",
     }}>
       <canvas ref={canvasRef} width={W} height={H} style={{
